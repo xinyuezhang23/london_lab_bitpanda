@@ -1,0 +1,51 @@
+---
+title: "bitpanda"
+author: "Xinyue Zhang"
+date: "5/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(geckor)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+pantos_history <- coin_history(coin_id = "busd", 
+                                vs_currency = "usd", 
+                                days = 90)
+```
+```{r}
+polkadot_history <- coin_history(coin_id = "polkadot", 
+                                vs_currency = "usd", 
+                                days = "max")
+```
+
+```{r}
+cosmos_history <- coin_history(coin_id = "cosmos", 
+                                vs_currency = "usd", 
+                                days=30)
+```
+
+```{r}
+history <- coin_history(coin_id = c("harmony","cosmos","polkadot","pantos"), 
+                                vs_currency = "usd", 
+                                days = "max")
+
+history<- 
+  history %>% 
+  mutate(market_cap= case_when(coin_id =="pantos" ~price* 486161689,
+                               TRUE ~ market_cap))
+
+write.csv(history,file="history.csv")
+```
+
+```{r}
+history %>% 
+  #filter(coin_id %in% c("cosmos","harmony")) %>% 
+  ggplot()+
+  geom_line(aes(x=timestamp,y=price,color=coin_id))
+      
+```
+
