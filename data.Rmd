@@ -9,35 +9,100 @@ output: html_document
 library(geckor)
 library(tidyverse)
 library(ggplot2)
+library(magrittr)
 ```
 
 ```{r}
-pantos_history <- coin_history(coin_id = "busd", 
-                                vs_currency = "usd", 
-                                days = 90)
+pantos_history <- coin_history(coin_id="pantos", 
+                               vs_currency="usd", 
+                               days = 'max', 
+                               interval=NULL)
+
+pantos_history<- pantos_history %>% mutate(market_cap= case_when(coin_id =="pantos" ~price* 486161689,TRUE ~ market_cap)) %>%
+                                    mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
 ```
+
+
 ```{r}
 polkadot_history <- coin_history(coin_id = "polkadot", 
                                 vs_currency = "usd", 
-                                days = "max")
+                                days = "max",
+                                interval = NULL)
+
+polkadot_history<- polkadot_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
 ```
+
 
 ```{r}
 cosmos_history <- coin_history(coin_id = "cosmos", 
                                 vs_currency = "usd", 
-                                days=30)
+                                days= 'max',
+                                interval = NULL)
+
+cosmos_history<- cosmos_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+```
+
+
+```{r}
+harmony_history <- coin_history(coin_id = "harmony", 
+                                vs_currency = "usd", 
+                                days= 'max',
+                                interval = NULL)
+
+harmony_history<- harmony_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+```
+
+
+```{r}
+best_history <- coin_history(coin_id = "bitpanda-ecosystem-token", 
+                                vs_currency = "usd", 
+                                days= 'max',
+                                interval = NULL)
+
+best_history<- best_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+```
+
+
+```{r}
+bnb_history <- coin_history(coin_id = "binancecoin", 
+                                vs_currency = "usd", 
+                                days= 'max',
+                                interval = NULL)
+
+bnb_history<- bnb_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
 ```
 
 ```{r}
-history <- coin_history(coin_id = c("harmony","cosmos","polkadot","pantos"), 
+tcap_history <- coin_history(coin_id = "total-crypto-market-cap-token", 
                                 vs_currency = "usd", 
-                                days = "max")
+                                days= 'max',
+                                interval = NULL)
 
-history<- 
-  history %>% 
-  mutate(market_cap= case_when(coin_id =="pantos" ~price* 486161689,
-                               TRUE ~ market_cap))
+tcap_history<- tcap_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
+                                    mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+```
 
+
+```{r}
+history<- rbind(pantos_history, polkadot_history, cosmos_history, harmony_history,
+                best_history, bnb_history, tcap_history)
+history
+```
+
+```{r}
 write.csv(history,file="history.csv")
 ```
 
