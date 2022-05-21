@@ -101,16 +101,43 @@ history<- rbind(pantos_history, polkadot_history, cosmos_history, harmony_histor
                 best_history, bnb_history, tcap_history)
 history
 ```
+There are some infinite values and cuased error when saving into Google sheet.
+```{r}
+history[sapply(history, is.infinite)] <- NaN
+```
+
 
 ```{r}
 write.csv(history,file="history.csv")
 ```
 
+# connect to Google sheet
 ```{r}
-history %>% 
-  #filter(coin_id %in% c("cosmos","harmony")) %>% 
-  ggplot()+
-  geom_line(aes(x=timestamp,y=price,color=coin_id))
+#code below only needs to be run once, it will guide you to connect to google account
+library(googlesheets4)
+library(googledrive)
+options(gargle_oauth_cache = ".secrets")
+drive_auth(cache = ".secrets", email = "emily.z0307@gmail.com")# email="" change to your own Google account
+gs4_auth(token = drive_token())
+
+```
+
+
+
+```{r}
+history_gs<- gs4_create(
+  "history", # file name
+  sheets =history #data source
+)
+```
+
+
+```{r}
+# history %>% 
+#   #filter(coin_id %in% c("cosmos","harmony")) %>% 
+#   ggplot()+
+#   geom_line(aes(x=timestamp,y=price,color=coin_id))
       
 ```
+
 
