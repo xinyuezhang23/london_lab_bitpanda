@@ -1,6 +1,6 @@
 ---
 title: "bitpanda"
-author: "Xinyue Zhang"
+author: "Xinyue Zhang, Hanyu Wang"
 date: "5/5/2022"
 output: html_document
 ---
@@ -21,7 +21,8 @@ pantos_history <- coin_history(coin_id="pantos",
 pantos_history<- pantos_history %>% mutate(market_cap= case_when(coin_id =="pantos" ~price* 486161689,TRUE ~ market_cap)) %>%
                                     mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100) %>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -33,7 +34,8 @@ polkadot_history <- coin_history(coin_id = "polkadot",
 
 polkadot_history<- polkadot_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -45,7 +47,8 @@ cosmos_history <- coin_history(coin_id = "cosmos",
 
 cosmos_history<- cosmos_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -57,7 +60,8 @@ harmony_history <- coin_history(coin_id = "harmony",
 
 harmony_history<- harmony_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -69,7 +73,8 @@ best_history <- coin_history(coin_id = "bitpanda-ecosystem-token",
 
 best_history<- best_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -81,7 +86,8 @@ bnb_history <- coin_history(coin_id = "binancecoin",
 
 bnb_history<- bnb_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 ```{r}
@@ -92,7 +98,8 @@ tcap_history <- coin_history(coin_id = "total-crypto-market-cap-token",
 
 tcap_history<- tcap_history %>% mutate(net_ret = (price-lag(price))/lag(price) *100) %>%
                                     mutate(change_tv = (total_volume-lag(total_volume))/lag(total_volume) *100) %>%
-                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)
+                                    mutate(change_mc = (market_cap-lag(market_cap))/lag(market_cap) *100)%>%
+                                    mutate(liquility = (total_volume/price))
 ```
 
 
@@ -117,7 +124,7 @@ write.csv(history,file="history.csv")
 library(googlesheets4)
 library(googledrive)
 options(gargle_oauth_cache = ".secrets")
-drive_auth(cache = ".secrets", email = "emily.z0307@gmail.com")# email="" change to your own Google account
+drive_auth(cache = ".secrets", email = "hanyuwangofficial@gmail.com")# email="" change to your own Google account
 gs4_auth(token = drive_token())
 
 ```
@@ -129,6 +136,10 @@ history_gs<- gs4_create(
   "history", # file name
   sheets =history #data source
 )
+```
+
+```{r}
+write_sheet(history, ss = '1jeU0eiOnYAL4yhaZ0Ot9eRZ5HR4kXgyYZl4yPofPwcw', sheet = 'history')
 ```
 
 
