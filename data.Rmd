@@ -1,6 +1,6 @@
 ---
 title: "bitpanda"
-author: "Xinyue Zhang, Hanyu Wang"
+author: "Xinyue Zhang, Hanyu Wang, Harsh Tripathi"
 date: "5/5/2022"
 output: html_document
 ---
@@ -10,6 +10,8 @@ library(geckor)
 library(tidyverse)
 library(ggplot2)
 library(magrittr)
+library(httr)
+library(jsonlite)
 ```
 
 ```{r}
@@ -108,11 +110,59 @@ history<- rbind(pantos_history, polkadot_history, cosmos_history, harmony_histor
                 best_history, bnb_history, tcap_history)
 history
 ```
+
+
+
+```{r}
+#Using cryptocompare API to get data for Pantos (coinId = 837419)
+res = GET("https://min-api.cryptocompare.com/data/social/coin/histo/day?coinId=837419&aggregate=7&api_key=bebc9e1c95f5963fc7f09dfc7995acb7478e3e970dba3b6c40974c7c859ff07a")
+
+#Checking if API call was successful
+if(res$status_code == 200){
+    #Converting raw unicode data to JSON and then a list and finally extracting data frame
+    social_media_data = fromJSON(rawToChar(res$content))$Data
+    
+    #Converting UNIX timestamp to date
+    social_media_data$time <- as.POSIXct(social_media_data$time, origin = "1970-01-01")
+    
+    #Renaming column
+    names(social_media_data)[names(social_media_data) == 'time'] <- 'timestamp'
+    
+    #List of relevant columns
+    relevant_columns = c('timestamp', 'twitter_followers', 'twitter_favourites', 'reddit_subscribers', 'reddit_active_users', 'reddit_posts_per_day', 'fb_likes')
+    
+    #Selecting relevant columns
+    social_media_data <- social_media_data %>% 
+      select(relevant_columns)
+    
+    #Extracting date in social media dataset to merge
+    social_media_data$date <- as.Date(social_media_data$timestamp)
+    
+    #Removing timestamp from social media data
+    social_media_data <- social_media_data %>%
+      select(-timestamp)
+    
+    #Extracting date in history dataset to merge
+    history$date <- as.Date(history$timestamp)
+    
+    #Adding coin_id to social media dataset to merge
+    social_media_data$coin_id <- 'pantos'
+    
+    #Merging the data
+    history <- left_join(history, social_media_data, by = c('date', 'coin_id'))
+    
+    #Dropping the date column
+    history <- history %>%
+      select(-date)
+    }
+```
+
+
+
 There are some infinite values and cuased error when saving into Google sheet.
 ```{r}
 history[sapply(history, is.infinite)] <- NaN
 ```
-
 
 ```{r}
 write.csv(history,file="history.csv")
